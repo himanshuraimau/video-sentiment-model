@@ -36,10 +36,9 @@ class VideoEncoder(nn.Module):
         num_fts = self.backbone.fc.in_features
         
         self.backbone.fc = nn.Sequential(
-            nn.Linear(num_fts, 256),
+            nn.Linear(num_fts, 128),
             nn.ReLU(),
-            nn.Dropout(0.2),
-            nn.Linear(256, 128)  # Project down to 128 to match other modalities
+            nn.Dropout(0.2) # Project down to 128 to match other modalities
         )
         
     def forward(self, x):
@@ -53,12 +52,12 @@ class AudioEncoder(nn.Module):
         # Input channels should match mel spectrogram features (128)
         self.conv_layers = nn.Sequential(
             # Low level features
-            nn.Conv1d(128, 128, kernel_size=3),
-            nn.BatchNorm1d(128),
+            nn.Conv1d(64, 64, kernel_size=3),
+            nn.BatchNorm1d(64),
             nn.ReLU(),
             nn.MaxPool1d(2),
             # Higher level features
-            nn.Conv1d(128, 128, kernel_size=3),
+            nn.Conv1d(64, 128, kernel_size=3),
             nn.BatchNorm1d(128),
             nn.ReLU(),
             nn.AdaptiveAvgPool1d(1),
@@ -89,7 +88,7 @@ class MultimodalSentimentModel(nn.Module):
         
         # Fusion Layer
         self.fusion_layer = nn.Sequential(
-            nn.Linear(128*3,256),
+            nn.Linear(128 * 3, 256),
             nn.BatchNorm1d(256),
             nn.ReLU(),
             nn.Dropout(0.3)
